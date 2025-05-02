@@ -1,11 +1,9 @@
 #include <BleKeyboard.h>
 #include <M5Cardputer.h>
 
-#include <map>
-
 BleKeyboard bleKey;
 
-void notyifyConnection() {
+void notifyConnection() {
   static bool connected = false;
   if (bleKey.isConnected() && !connected) {
     Serial.println("Connected");
@@ -81,7 +79,7 @@ void setup() {
 
 void loop() {
   M5Cardputer.update();
-  notyifyConnection();
+  notifyConnection();
   keyInput();
   delay(20);
 }
