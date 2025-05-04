@@ -4,6 +4,18 @@
 #include <map>
 
 BleKeyboard bleKey;
+const unsigned int keyInputTimeout = 180000;  // 3分
+
+// 最後のキー入力時間
+unsigned long lastKeyInput = 0;
+
+void checkBattery() {
+  if (millis() > keyInputTimeout + lastKeyInput) {
+    M5Cardputer.Speaker.tone(1000, 100);
+    delay(1000);
+    M5.Power.deepSleep(0, false);
+  }
+}
 
 void notifyConnection() {
   static bool connected = false;
@@ -56,9 +68,13 @@ void charSend(char k, KeyboardMode mode) {
   }
 }
 void keySend(m5::Keyboard_Class::KeysState key) {
+  // 現在のキーボードモード
   static KeyboardMode keyboardMode = KeyboardMode::normal;
-  static uint8_t currentModifiers =
-      0;  // 直前に有効になっているモディファイアキー
+  // 直前に有効になっているモディファイアキー
+  static uint8_t currentModifiers = 0;
+
+  // タイムアウト内にキー入力したよ。
+  lastKeyInput = millis();
   if (key.fn) {
     if (currentModifiers) {
       M5Cardputer.Speaker.tone(1500, 100);
@@ -100,17 +116,19 @@ void keySend(m5::Keyboard_Class::KeysState key) {
   } else {
     if (key.del) {
       bleKey.write(KEY_BACKSPACE);
+      M5Cardputer.Speaker.tone(3000, 5);
     }
     if (key.enter) {
       bleKey.write(KEY_RETURN);
-    }
-    if (key.space) {
+      M5Cardputer.Speaker.tone(4000, 5);
     }
     if (key.tab) {
+      M5Cardputer.Speaker.tone(3000, 5);
       bleKey.write(KEY_TAB);
     }
     for (auto i : key.word) {
       charSend(i, keyboardMode);
+      M5Cardputer.Speaker.tone(4000, 5);
     }
     bleKey.releaseAll();
   }
@@ -129,11 +147,18 @@ void keyInput() {
 void setup() {
   auto cfg = M5.config();
   cfg.serial_baudrate = 115200;
+  cfg.internal_imu = false;
+  cfg.internal_mic = false;
+  cfg.output_power = false;
+  cfg.led_brightness = 0;
   M5Cardputer.begin(cfg, true);
+  lastKeyInput = millis();
+  M5Cardputer.Speaker.setVolume(0);
   bleKey.begin();
   delay(300);
   Serial.println("Hello Tiny keyboard.");
-  M5Cardputer.Speaker.setVolume(50);
+  Serial.println(lastKeyInput);
+  M5Cardputer.Speaker.setVolume(25);
   M5Cardputer.Speaker.tone(2000, 100);
 }
 
@@ -141,5 +166,6 @@ void loop() {
   M5Cardputer.update();
   notifyConnection();
   keyInput();
+  checkBattery();
   delay(20);
 }
