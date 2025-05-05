@@ -48,7 +48,7 @@ void charSend(char k, KeyboardMode mode) {
       bleKey.write(numKeyMap.at(k));
     }
   } else if (mode == KeyboardMode::cursor) {
-    if (cursorKeyMap.find(k) != numKeyMap.end()) {
+    if (cursorKeyMap.find(k) != cursorKeyMap.end()) {
       bleKey.write(cursorKeyMap.at(k));
     }
   } else if (mode == KeyboardMode::media) {
