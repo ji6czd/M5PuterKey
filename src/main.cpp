@@ -71,7 +71,7 @@ void charSend(char k, KeyboardMode keyMode, KeyboardMode srMode) {
       {'p', '4'}, {'[', '5'}, {']', '6'}, {'0', '1'}, {'-', '2'}, {'=', '3'}};
   const std::map<char, char> cursorKeyMap = {
       {',', KEY_UP_ARROW},    {'.', KEY_DOWN_ARROW}, {'m', KEY_LEFT_ARROW},
-      {'/', KEY_RIGHT_ARROW}, {'k', KEY_HOME},       {'\\', KEY_END},
+      {'/', KEY_RIGHT_ARROW}, {'k', KEY_HOME},       {'\'', KEY_END},
       {'l', KEY_PAGE_UP},     {';', KEY_PAGE_DOWN}};
   // 必要があればスクリーンリーダーコマンドキーを送信
   if (srMode != KeyboardMode::normal) {
